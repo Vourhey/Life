@@ -2,4 +2,7 @@ a.out
 *.o
 input_state
 output_ages
-
+Life.pro.user
+moc_*
+Makefile*
+Life
