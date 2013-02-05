@@ -17,10 +17,15 @@ public:
     int height() const;
     int width() const;
 
-    void setLife(const QPoint &point, bool l);
+    quint32 population() const;
+    quint32 ageCount() const;
 
-    bool isLive(int y, int x) const;
+    void setLife(const QPoint &point, bool l);
+    bool isLive(const QPoint &point) const;
+    bool isLive(int x, int y) const;
+
     const QVector<QBitArray> &data() const;
+    void setData(const QVector<QBitArray> &d);
 
 signals:
     void ageChanged();
@@ -32,6 +37,7 @@ public slots:
     void setWidth(int width);
 
 private:
+    void init();
     int neighborhood(int y, int x);
     bool isValid(int y, int x);
 
@@ -52,6 +58,8 @@ private:
     QVector<QBitArray> field;
     QList<ChangedPoints> points;
     int m_height, m_width;
+    quint32 m_population;
+    quint32 m_ageCount;
 };
 
 #endif // AGE_H

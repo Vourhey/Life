@@ -8,8 +8,6 @@ TEMPLATE =  app
 TARGET   =  Life
 CONFIG   += debug_and_release
 
-INCLUDEPATH += headers/
-
 OBJECTS_DIR = obj/
 MOC_DIR = moc/
 
@@ -31,7 +29,7 @@ SOURCES += main.cpp \
     src/age.cpp \
     src/spinbox.cpp
 
-HEADERS += headers/mainwindow.h \
-    headers/fieldwidget.h \
-    headers/age.h \
-    headers/spinbox.h
+HEADERS += src/mainwindow.h \
+    src/fieldwidget.h \
+    src/age.h \
+    src/spinbox.h

@@ -34,7 +34,7 @@ FieldWidget::FieldWidget(QWidget *parent)
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setMouseTracking(true);
     setCursor(Qt::PointingHandCursor);
-    squareSize = 16;
+    squareSize = 10;
 }
 
 Age *FieldWidget::age()
@@ -53,6 +53,36 @@ void FieldWidget::setReadOnly(bool ro)
     }
 }
 
+int FieldWidget::zoom() const
+{
+    return squareSize;
+}
+
+void FieldWidget::setZoom(int z)
+{
+    squareSize = z;
+    if(squareSize <= 0) {
+        squareSize = 1;
+    }
+    repaint();
+}
+
+/*
+void FieldWidget::zoomIn()
+{
+    setZoom(squareSize + 1);
+}
+
+void FieldWidget::zoomOut()
+{
+    --squareSize;
+    if(squareSize <= 0) {
+        squareSize = 1;
+    }
+    repaint();
+}
+*/
+
 QSize FieldWidget::sizeHint() const
 {
     int w = squareSize * m_age->width();
@@ -61,37 +91,47 @@ QSize FieldWidget::sizeHint() const
     return QSize(w, h);
 }
 
+void FieldWidget::setCell(const QPoint &p)
+{
+    if(!m_readOnly) {
+        m_age->setLife(p, !m_age->isLive(p));
+    }
+}
+
 void FieldWidget::mousePressEvent(QMouseEvent *e)
 {
-    qDebug() << e->button();
-    if(e->button() == Qt::LeftButton && !m_readOnly) {
+    if(e->button() == Qt::LeftButton) {
         int row = e->pos().y() / squareSize;
         int column =  e->pos().x() / squareSize;
 
-        bool current = m_age->isLive(row, column);
-      //  printVector(m_age.data());
-        m_age->setLife(QPoint(column, row), !current);
-      //  printVector(m_age.data());
-        repaint();
+        setCell(QPoint(row, column));
     }
 }
 
 void FieldWidget::mouseMoveEvent(QMouseEvent *e)
 {
+    static QPoint lastPos;
+
     int x = e->pos().x() / squareSize;
     int y = e->pos().y() / squareSize;
 
-    qDebug() << e->button();
-    // пока что не работает.. почему?..
-    if(e->button() & Qt::LeftButton) {
-        qDebug() << "I'm here\n";
-        bool current = m_age->isLive(y, x);
-        m_age->setLife(QPoint(x, y), !current);
-        repaint();
+    if(lastPos == QPoint(x, y))
+        return;
+
+    lastPos = QPoint(x, y);
+
+    if(e->buttons() & Qt::LeftButton) {
+        setCell(QPoint(y, x));
     }
-    qDebug() << "emit...";
 
     emit changedCoordinates(x, y);
+}
+
+void FieldWidget::wheelEvent(QWheelEvent *e)
+{
+    int numStep = e->delta() / 8 / 15;
+
+    setZoom(squareSize + numStep);
 }
 
 void FieldWidget::paintEvent(QPaintEvent *e)
@@ -110,7 +150,12 @@ void FieldWidget::paintEvent(QPaintEvent *e)
     //qDebug("%d %d\n", endRow, endColumn);
   //  qDebug() << redrawRect << visibleRegion();
 
-    p.setPen(QPen(Qt::gray));
+    if(squareSize > 4) {
+        p.setPen(QPen(Qt::gray));
+    } else {
+        p.setPen(Qt::NoPen);
+    }
+
     for (int row = beginRow; row <= endRow && row < m_age->height(); ++row) {
         for (int column = beginColumn; column <= endColumn && column < m_age->width(); ++column) {
             if(m_age->isLive(row, column)) {

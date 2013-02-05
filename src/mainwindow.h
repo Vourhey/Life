@@ -19,6 +19,11 @@ private slots:
     void stopSlot();
     void setPeriod(int p);
     void updateCoordinates(int x, int y);
+    void updateLabels();
+    void saveStateInFile();
+    void loadStateFromFile();
+    void randomSlot();
+    void aboutSlot();
     
 private:
     void enableTools(bool e);
@@ -29,7 +34,10 @@ private:
     SpinBox *m_heightBox;
     SpinBox *m_widthBox;
     SpinBox *m_secBox;
+    SpinBox *m_zoomBox;
     QLabel *xyLabel;
+    QLabel *populationLabel;
+    QLabel *agesLabel;
 
     QAction *startPauseAct;
     QAction *stopAct;
