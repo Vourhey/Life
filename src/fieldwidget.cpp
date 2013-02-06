@@ -94,7 +94,7 @@ QSize FieldWidget::sizeHint() const
 void FieldWidget::setCell(const QPoint &p)
 {
     if(!m_readOnly) {
-        m_age->setLife(p, !m_age->isLive(p));
+        m_age->setLife(p);
     }
 }
 
@@ -132,6 +132,7 @@ void FieldWidget::wheelEvent(QWheelEvent *e)
     int numStep = e->delta() / 8 / 15;
 
     setZoom(squareSize + numStep);
+    emit changedZoom(squareSize);
 }
 
 void FieldWidget::paintEvent(QPaintEvent *e)
@@ -150,7 +151,7 @@ void FieldWidget::paintEvent(QPaintEvent *e)
     //qDebug("%d %d\n", endRow, endColumn);
   //  qDebug() << redrawRect << visibleRegion();
 
-    if(squareSize > 4) {
+    if(squareSize > 4 && !m_readOnly) {
         p.setPen(QPen(Qt::gray));
     } else {
         p.setPen(Qt::NoPen);

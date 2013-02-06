@@ -21,6 +21,7 @@ public:
 
 signals:
     void changedCoordinates(int x, int y);
+    void changedZoom(int z);
 
 public slots:
     void setZoom(int z);

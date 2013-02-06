@@ -74,13 +74,13 @@ quint32 Age::ageCount() const
 }
 
 // не проверяется на выход за пределы
-void Age::setLife(const QPoint &point, bool l)
+void Age::setLife(const QPoint &point)
 {
  //   qWarning() << "setLife(" << l << ")";
  //   qWarning() << point;
-    field[point.x()][point.y()] =  l;
+    field[point.x()].toggleBit(point.y());
 
-    if(l) {
+    if(field[point.x()][point.y()]) {
         ++m_population;
     } else {
         --m_population;
@@ -190,3 +190,19 @@ int Age::neighborhood(int y, int x)
 
     return count;
 }
+
+QDataStream &operator<<(QDataStream &stream, const Age *a)
+{
+    stream << a->m_height << a->m_width << a->m_population;
+    stream << a->field;
+    return stream;
+}
+
+QDataStream &operator>>(QDataStream &stream, Age *a)
+{
+    stream >> a->m_height >> a->m_width >> a->m_population;
+    stream >> a->field;
+    a->m_ageCount = 0;
+    return stream;
+}
+

@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_zoomBox->m_spin->setRange(1, 100);
     m_zoomBox->m_spin->setValue(fieldWidget->zoom());
     connect(m_zoomBox->m_spin, SIGNAL(valueChanged(int)), fieldWidget, SLOT(setZoom(int)));
+    connect(fieldWidget, SIGNAL(changedZoom(int)), m_zoomBox->m_spin, SLOT(setValue(int)));
 
     m_toolBar->addWidget(m_heightBox);
     m_toolBar->addWidget(m_widthBox);
@@ -115,21 +116,30 @@ void MainWindow::enableTools(bool e)
 
 void MainWindow::saveStateInFile()
 {
-   QString fileName = QFileDialog::getSaveFileName(this, tr("Save State"), "examples");
+    // временное решение
+    if(inprocess) {
+        return;
+    }
 
-   QFile saveFile(fileName);
-   if(!saveFile.open(QIODevice::WriteOnly)) {
-       qWarning("Can't open file %s", qPrintable(fileName));
-       return;
-   }
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save State"), "examples");
 
-   QDataStream out(&saveFile);
-   out << stateAge->height() << stateAge->width();
-   out << stateAge->data();
+    QFile saveFile(fileName);
+    if(!saveFile.open(QIODevice::WriteOnly)) {
+        qWarning("Can't open file %s", qPrintable(fileName));
+        return;
+    }
+
+    QDataStream out(&saveFile);
+    out << stateAge;
 }
 
 void MainWindow::loadStateFromFile()
 {
+    // временное решение
+    if(inprocess) {
+        return;
+    }
+
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open State"), "example");
 
     QFile loadFile(fileName);
@@ -139,19 +149,21 @@ void MainWindow::loadStateFromFile()
     }
 
     QDataStream in(&loadFile);
-    int m;
-    in >> m;
-    stateAge->setHeight(m);
-    in >> m;
-    stateAge->setWidth(m);
-    QVector<QBitArray> data;
-    in >> data;
-    stateAge->setData(data);
+    in >> stateAge;
     fieldWidget->update();
+    m_heightBox->m_spin->setValue(stateAge->height());
+    m_widthBox->m_spin->setValue(stateAge->width());
+    m_zoomBox->m_spin->setValue(fieldWidget->zoom());
+    updateLabels();
 }
 
 void MainWindow::randomSlot()
 {
+    // временное решение
+    if(inprocess) {
+        return;
+    }
+
     int h = stateAge->height();
     int w = stateAge->width();
     
@@ -166,7 +178,7 @@ void MainWindow::randomSlot()
         QPoint p;
         p.rx() = rand() % w;
         p.ry() = rand() % h;
-        stateAge->setLife(p, true);
+        stateAge->setLife(p);
         --cells;
     }
 

@@ -6,6 +6,7 @@
 #include <QBitArray>
 #include <QList>
 #include <QPoint>
+#include <QDataStream>
 
 class Age : public QObject
 {
@@ -20,12 +21,15 @@ public:
     quint32 population() const;
     quint32 ageCount() const;
 
-    void setLife(const QPoint &point, bool l);
+    void setLife(const QPoint &point);
     bool isLive(const QPoint &point) const;
     bool isLive(int x, int y) const;
 
     const QVector<QBitArray> &data() const;
     void setData(const QVector<QBitArray> &d);
+
+    friend QDataStream &operator<<(QDataStream &stream, const Age *a);
+    friend QDataStream &operator>>(QDataStream &stream, Age *a);
 
 signals:
     void ageChanged();
